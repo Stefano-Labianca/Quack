@@ -2,12 +2,17 @@ from enum import Enum
 
 
 class TextType(Enum):
-    NORMAL = 1
+    TEXT = 1
     BOLD = 2
     ITALIC = 3
     CODE = 4
     LINK = 5
     IMAGE = 6
+
+
+class InvalidTextNodeError(AttributeError):
+    def __init__(self, *args):
+        super().__init__(*args)
 
 
 class TextNode:
