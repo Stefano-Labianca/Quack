@@ -7,17 +7,17 @@ class HTMLNode:
     def __init__(self, tag: str | None = None, value: str | None = None, children: list | None = None, props: dict[str, any] | None = None):
         """
         ### HTMLNode
-            - `tag`: A string representing the HTML tag name (e.g. "p", "a", "h1", etc.)
-            - `value`: A string representing the value of the HTML tag 
-            - `children`: A list of `HTMLNode` objects representing the children of this node
-            - `props`: A dictionary of key-value pairs representing the attributes of the HTML tag. 
-            For example, a link (`<a>` tag) might have `{"href": "https://www.google.com"}`
+        - `tag`: A string representing the HTML tag name (e.g. "p", "a", "h1", etc.)
+        - `value`: A string representing the value of the HTML tag 
+        - `children`: A list of `HTMLNode` objects representing the children of this node
+        - `props`: A dictionary of key-value pairs representing the attributes of the HTML tag. 
+        For example, a link (`<a>` tag) might have `{"href": "https://www.google.com"}`
 
         ### Implementation Notes
-            - An `HTMLNode` without a `tag` will just render as raw text
-            - An `HTMLNode` without a `value` will be assumed to have children
-            - An `HTMLNode` without `children` will be assumed to have a value
-            - An `HTMLNode` without `props` simply won't have any attributes
+        - An `HTMLNode` without a `tag` will just render as raw text
+        - An `HTMLNode` without a `value` will be assumed to have children
+        - An `HTMLNode` without `children` will be assumed to have a value
+        - An `HTMLNode` without `props` simply won't have any attributes
         """
 
         if tag == None and value == None and children == None and props == None:
