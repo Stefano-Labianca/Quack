@@ -1,3 +1,5 @@
+import html
+
 from .htmlnode import HTMLNode
 
 
@@ -12,6 +14,8 @@ class LeafNode(HTMLNode):
         - `props`: A dictionary of key-value pairs representing the attributes of the HTML tag. 
         For example, a link (`<a>` tag) might have `{"href": "https://www.google.com"}`
         """
+        if value != None:
+            value = html.escape(value)
 
         super().__init__(tag, value, [], props)
 

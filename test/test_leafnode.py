@@ -34,6 +34,12 @@ class TestLeafNode(unittest.TestCase):
             lambda *args, **kwargs: node.to_html()
         )
 
+    def test_escape_chars(self):
+        node = LeafNode("p", "<Hello '& \"World\">")
+        self.assertEqual(
+            node.to_html(), "<p>&lt;Hello &#x27;&amp; &quot;World&quot;&gt;</p>"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
