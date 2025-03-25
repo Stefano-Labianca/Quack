@@ -30,7 +30,7 @@ class HTMLNode:
                 "Argument `value` and `children` cannot be both empty or None"
             )
 
-        if value != None and children != None:
+        if value != None and children != None and len(children) > 0:
             raise ValueError(
                 "HTMLNode cannot have both `value` and `children` set. Pick one."
             )
