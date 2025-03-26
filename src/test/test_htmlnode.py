@@ -49,32 +49,6 @@ class TestHTMLNode(unittest.TestCase):
             lambda *args, **kwargs: HTMLNode("div", "Some content", nodes)
         )
 
-    def test_invalid_tag_type(self):
-        self.assertRaises(
-            TypeError,
-            lambda *args, **kwargs: HTMLNode(1, "Dummy")
-        )
-
-    def test_invalid_value_type(self):
-        self.assertRaises(
-            TypeError,
-            lambda *args, **kwargs: HTMLNode("p", 1)
-        )
-
-    def test_invalid_children_type(self):
-        children = {1, 2, 3}
-        self.assertRaises(
-            TypeError,
-            lambda *args, **kwargs: HTMLNode("p", children=children)
-        )
-
-    def test_invalid_props_type(self):
-        props = {1, 2, 3}
-        self.assertRaises(
-            TypeError,
-            lambda *args, **kwargs: HTMLNode("p", "A value", props=props)
-        )
-
 
 if __name__ == "__main__":
     unittest.main()

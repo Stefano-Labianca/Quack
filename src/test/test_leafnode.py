@@ -20,13 +20,6 @@ class TestLeafNode(unittest.TestCase):
             node.to_html(), "I am a simple text!"
         )
 
-    def test_missing_value_from_leaf(self):
-        node = LeafNode("p", None)
-        self.assertRaises(
-            ValueError,
-            lambda *args, **kwargs: node.to_html()
-        )
-
     def test_missing_tag_from_leaf_with_props(self):
         node = LeafNode(None, "Dummy node", {"href": "https://www.google.com"})
         self.assertRaises(

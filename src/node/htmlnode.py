@@ -4,7 +4,7 @@ class AllNoneArgumentsError(Exception):
 
 
 class HTMLNode:
-    def __init__(self, tag: str | None = None, value: str | None = None, children: list | None = None, props: dict[str, any] | None = None):
+    def __init__(self, tag: str | None = None, value: str | None = None, children: list | None = None, props: dict[str, str] | None = None):
         """
         ### HTMLNode
         - `tag`: A string representing the HTML tag name (e.g. "p", "a", "h1", etc.)

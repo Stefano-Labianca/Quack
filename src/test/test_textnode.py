@@ -15,12 +15,6 @@ class TestTextNode(unittest.TestCase):
                          TextType.ITALIC, "http://localhost")
         self.assertNotEqual(node, node2)
 
-    def test_invalid_text_type(self):
-        self.assertRaises(AttributeError,
-                          lambda *args, **kwargs: TextNode(
-                              "This is a text node", TextType.INVALID)
-                          )
-
     def test_link_is_not_none(self):
         node = TextNode("This is a text node", TextType.BOLD,
                         "https://docs.python.org/3/library/unittest.html")

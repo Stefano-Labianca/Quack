@@ -13,8 +13,18 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
         case TextType.CODE:
             return LeafNode("code", text_node.text)
         case TextType.LINK:
+            if text_node.url == None:
+                raise InvalidTextNodeError(
+                    "TextType.LINK cannot have None url"
+                )
+
             return LeafNode("a", text_node.text, {"href": text_node.url})
         case TextType.IMAGE:
+            if text_node.url == None:
+                raise InvalidTextNodeError(
+                    "TextType.IMAGE cannot have None url"
+                )
+
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case _:
             raise InvalidTextNodeError(

@@ -4,7 +4,7 @@ from .htmlnode import HTMLNode
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag: str | None, value: str, props: dict[str, any] | None = None):
+    def __init__(self, tag: str | None, value: str, props: dict[str, str] | None = None):
         """
         ### LeafNode
         A `LeafNode` rappresent an HTML tag without children

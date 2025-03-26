@@ -7,12 +7,25 @@ class InvalidHTMLNodeError(Exception):
 
 
 class ParentNode(HTMLNode):
-    def __init__(self, tag: str, children: list[HTMLNode], props: dict[str, any] | None = None):
+    """
+    ### ParentNode
+    A `ParentNode` rappresent an HTML tag with children
+
+    - `tag`: A string representing the HTML tag name (e.g. "p", "a", "h1", etc.)
+    - `children`: A list of `HTMLNode` objects representing the children of this node
+    - `props`: A dictionary of key-value pairs representing the attributes of the HTML tag. 
+        For example, a link (`<a>` tag) might have `{"href": "https://www.google.com"}`
+    """
+
+    def __init__(self, tag: str, children: list, props: dict[str, str] | None = None):
         super().__init__(tag, None, children, props)
 
     def to_html(self):
         if self.tag == None:
             raise ValueError("Parent node must have a valid tag")
+
+        if self.children == None:
+            raise ValueError("Parent node can not have None as `children`")
 
         nodes = ""
         for child in self.children:

@@ -1,0 +1,8 @@
+{
+  "include": ["src"],
+  "venvPath": ".",
+  "venv": "venv",
+  "strictListInference": true,
+  "strictSetInference": true,
+  "strictDictionaryInference": true
+}

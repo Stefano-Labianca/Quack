@@ -1,7 +1,7 @@
 import unittest
 
 from src.converter.converter import text_node_to_html_node
-from src.node.textnode import InvalidTextNodeError, TextNode, TextType
+from src.node.textnode import TextNode, TextType
 
 
 class TestTextNodeToHTMLNodeConverter(unittest.TestCase):
