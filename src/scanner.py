@@ -1,4 +1,3 @@
-from curses.ascii import isalpha
 from nodes.textnode import TextNode, TextType
 
 class MalformattedMarkdownError(ValueError):
