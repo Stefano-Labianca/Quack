@@ -30,6 +30,7 @@ class TextNode:
 
     def __eq__(self, other):
         return (
+            type(self) == type(other) and 
             self.text == other.text and
             self.text_type == other.text_type and
             self.url == other.url
