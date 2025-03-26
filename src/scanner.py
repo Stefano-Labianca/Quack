@@ -46,7 +46,7 @@ class Scanner:
         while self.__peek() != self.delimiter and not self.__is_at_end():
            self.__advance()
 
-        return self.source[self.start:self.current]
+        return self.source[self.start : self.current]
 
     def __handle_single_delimiter(self):
         while self.__peek() != self.delimiter and not self.__is_at_end():
@@ -62,13 +62,6 @@ class Scanner:
 
     def __handle_multiple_delimiter(self):
         print("I'm a bold block")
-
-    def __is_text(self, c: str):
-        return (
-            (c >= 'a' and c <= 'z') or
-            (c >= 'A' and c <= 'Z') or
-            c == " "
-        )
 
     def __is_at_end(self):
         return self.current >= len(self.source)
