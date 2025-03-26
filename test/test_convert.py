@@ -1,7 +1,12 @@
 import unittest
+import os
+import sys
+sys.path.append(os.path.abspath("./src"))
 
-from src.converter.converter import text_node_to_html_node
-from src.node.textnode import TextNode, TextType
+from nodes.textnode import TextNode, TextType
+from convert import text_node_to_html_node
+
+
 
 
 class TestTextNodeToHTMLNodeConverter(unittest.TestCase):

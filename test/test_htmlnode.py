@@ -1,6 +1,6 @@
 import unittest
 
-from src.node.htmlnode import AllNoneArgumentsError, HTMLNode
+from src.nodes.htmlnode import AllNoneArgumentsError, HTMLNode
 
 
 class TestHTMLNode(unittest.TestCase):

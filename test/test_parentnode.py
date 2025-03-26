@@ -1,7 +1,7 @@
 import unittest
 
-from src.node.leafnode import LeafNode
-from src.node.parentnode import InvalidHTMLNodeError, ParentNode
+from src.nodes.leafnode import LeafNode
+from src.nodes.parentnode import ParentNode
 
 
 class TestParentNode(unittest.TestCase):
