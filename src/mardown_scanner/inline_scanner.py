@@ -2,8 +2,9 @@ from typing import Literal
 from nodes.textnode import TextNode, TextType
 import re 
 
-MARKDOWN_IMAGE_REGEX = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
+MARKDOWN_IMAGE_REGEX = r"!\[(.*?)\]\(([^\(\)]*)\)"
 MARKDOWN_LINK_REGEX = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+
 
 class MalformattedMarkdownError(ValueError):
     def __init__(self, *args: object) -> None:
@@ -40,11 +41,38 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
 
 def extract_links(link_type: Literal["image"] | Literal["link"]):
     def extract_markdown_images(text: str):        
-        return re.findall(MARKDOWN_IMAGE_REGEX, text)
+        images = re.findall(MARKDOWN_IMAGE_REGEX, text)
+
+        for image in images:
+            brachets_stack: list[str] = []
+            alt_content: str = image[0]
+
+            if ("[" not in alt_content) and ("]" not in alt_content):
+                continue
+
+            for symbol in alt_content:
+                if symbol == "]" and len(brachets_stack) == 0:
+                    raise MalformattedMarkdownError(f"Malformatted image: {image}")
+
+                if symbol == "[":
+                    brachets_stack.append(symbol)
+                elif symbol == "]":
+                    brachets_stack.pop()
+
+            if len(brachets_stack) > 0:
+                raise MalformattedMarkdownError(f"Malformatted image: {image}")
+
+        return images
+        
+
 
     def extract_markdown_links(text: str):
-        return re.findall(MARKDOWN_LINK_REGEX, text)
-    
+        simple_links = re.findall(MARKDOWN_LINK_REGEX, text)
+
+        # TODO: Handle Nested alt for links and image links inside a link
+        # TODO: Need more test for this regex on links: (?<!!)\[([^\[\]].*?)\]\(([^\(\)]*)\)
+        return simple_links
+
     if link_type == "image":
         return extract_markdown_images
     if link_type == "link":

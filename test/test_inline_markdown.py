@@ -1,6 +1,6 @@
 import unittest
 
-from mardown_scanner.inline_scanner import split_nodes_delimiter, extract_links
+from mardown_scanner.inline_scanner import MalformattedMarkdownError, split_nodes_delimiter, extract_links
 from nodes.textnode import TextNode, TextType
 
 class TestInlineMarkdown(unittest.TestCase):
@@ -102,6 +102,45 @@ class TestInlineMarkdown(unittest.TestCase):
         content = extractor(text)
 
         self.assertListEqual([], content)
+
+    def test_nested_alt(self):
+        text = "![image [with nested] alt text](https://example.com/image.png)"
+        extractor = extract_links("image")
+        content = extractor(text)
+
+        self.assertListEqual([('image [with nested] alt text', 'https://example.com/image.png')], content)
+
+    def test_deep_nested_alt(self):
+        text = "![alt [nested [more nested]]](https://example.com/img.jpeg)"
+        extractor = extract_links("image")
+        content = extractor(text)
+
+        self.assertListEqual([('alt [nested [more nested]]', 'https://example.com/img.jpeg')], content)
+
+    def test_nested_and_simple_image_alt(self):
+        text = "This is text with a ![rick [roll]](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        extractor = extract_links("image")
+        content = extractor(text)
+
+        self.assertListEqual(
+            [('rick [roll]', 'https://i.imgur.com/aKaOqIh.gif'), ('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')],
+            content
+        )
+    
+    def test_multiple_nested_alt(self):
+        text = "![alt nested [more nested]](https://example.com/img.jpeg) and ![again alt nested [more nested]](https://example.com/img.jpeg)"
+        extractor = extract_links("image")
+        content = extractor(text)
+
+        self.assertListEqual(
+            [('alt nested [more nested]', 'https://example.com/img.jpeg'), ('again alt nested [more nested]', 'https://example.com/img.jpeg')],
+            content
+        )
+
+    def test_invalid_alt(self):
+        extractor = extract_links("image")
+        text = "![invalid [alt]]](https://example.com/img.jpeg)"
+        self.assertRaises(MalformattedMarkdownError, lambda *args, **kwargs: extractor(text)) 
 
     def test_link(self):
         text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
