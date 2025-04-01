@@ -1,4 +1,4 @@
-from mardown_scanner.block_scanner import markdown_to_blocks
+from markdown_scanner.block_scanner import markdown_to_blocks
 
 
 md = """

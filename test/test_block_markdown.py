@@ -1,9 +1,10 @@
 import os
 import sys
+
+from markdown_scanner.block_scanner import markdown_to_blocks
 sys.path.append(os.path.abspath("./src"))
 
 import unittest
-from mardown_scanner.block_scanner import markdown_to_blocks
 
 
 class TestBlockMarkdown(unittest.TestCase):
@@ -33,7 +34,7 @@ This is the same paragraph on a new line
 
 
 
-        
+
 This is **bolded paragraph**
 
 This is another paragraph with _italic_ text and `code` here

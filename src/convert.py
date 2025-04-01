@@ -1,4 +1,4 @@
-from mardown_scanner.inline_scanner import split_nodes_delimiter, split_nodes_image, split_nodes_link
+from markdown_scanner.inline_scanner import split_nodes_delimiter, split_nodes_image, split_nodes_link
 from nodes.leafnode import LeafNode
 from nodes.textnode import InvalidTextNodeError, TextNode, TextType
 
