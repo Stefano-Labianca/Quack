@@ -1,6 +1,6 @@
 import unittest
 
-from mardown_scanner.inline_scanner import MalformattedMarkdownError, split_nodes_delimiter, extract_links
+from mardown_scanner.inline_scanner import MalformattedMarkdownError, split_nodes_delimiter, extract_links, split_nodes_image, split_nodes_link
 from nodes.textnode import TextNode, TextType
 
 class TestInlineMarkdown(unittest.TestCase):
@@ -192,3 +192,108 @@ class TestInlineMarkdown(unittest.TestCase):
         text = "[invalid [alt]]](https://example.com/img.jpeg)"
         extractor = extract_links("link")
         self.assertRaises(MalformattedMarkdownError, lambda *args, **kwargs: extractor(text)) 
+
+    def test_split_nodes_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_nodes_image_with_no_image(self):
+        node = TextNode(
+            "This is text without images",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        
+        self.assertListEqual(
+            [
+                TextNode("This is text without images", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+    
+    def test_split_node_image_with_nestes_alt(self):
+        node = TextNode(
+            "Simple alt ![image](https://i.imgur.com/zjjcJKZ.png) and nested tag ![second [image]](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+
+        self.assertListEqual(
+            [
+                TextNode("Simple alt ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and nested tag ", TextType.TEXT),
+                TextNode(
+                    "second [image]", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_nodes_link(self):
+        node = TextNode(
+            "This is text with an [link](https://i.imgur.com/zjjcJKZ.png) and another [second link](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second link", TextType.LINK, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_nodes_link_with_no_links(self):
+        node = TextNode(
+            "This is text without links",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        
+        self.assertListEqual(
+            [
+                TextNode("This is text without links", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+    
+    def test_split_node_link_with_nestes_alt(self):
+        node = TextNode(
+            "Simple alt [link](https://i.imgur.com/zjjcJKZ.png) and nested tag [second [link]](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+
+        self.assertListEqual(
+            [
+                TextNode("Simple alt ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and nested tag ", TextType.TEXT),
+                TextNode(
+                    "second [link]", TextType.LINK, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+    

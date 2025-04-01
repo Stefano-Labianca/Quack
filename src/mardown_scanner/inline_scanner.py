@@ -11,14 +11,14 @@ class MalformattedMarkdownError(ValueError):
 
 
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType):
-    new_nodes = []
+    new_nodes: list[TextNode] = []
 
     for old_node in old_nodes:
         if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
     
-        split_nodes = []
+        split_nodes: list[TextNode] = []
         sections = old_node.text.split(delimiter)
 
         if len(sections) % 2 == 0:
@@ -34,6 +34,75 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
                 split_nodes.append(TextNode(sections[i], text_type))
 
         new_nodes.extend(split_nodes)
+
+    return new_nodes
+
+
+def split_nodes_image(old_nodes: list[TextNode]):
+    new_nodes: list[TextNode] = []
+    image_extractor = extract_links("image")
+
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+
+        content = old_node.text
+        parsed_images = image_extractor(old_node.text)
+        
+        if len(parsed_images) == 0:
+            new_nodes.append(old_node)
+            continue
+
+        for parsed_image in parsed_images:
+            image_alt = parsed_image[0]
+            image_link = parsed_image[1]
+
+            sections = content.split(f"![{image_alt}]({image_link})", 1)
+            text_part = sections[0]
+            content = sections[1]
+
+            new_nodes.append(
+                TextNode(text_part, TextType.TEXT)
+            )
+
+            new_nodes.append(
+                TextNode(image_alt, TextType.IMAGE, image_link)
+            )
+
+    return new_nodes
+    
+def split_nodes_link(old_nodes: list[TextNode]):
+    new_nodes: list[TextNode] = []
+    link_extractor = extract_links("link")
+
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+
+        content = old_node.text
+        parsed_links = link_extractor(old_node.text)
+
+        if len(parsed_links) == 0:
+            new_nodes.append(old_node)
+            continue
+
+        for parsed_link in parsed_links:
+            link_alt = parsed_link[0]
+            link_url = parsed_link[1]
+
+            sections = content.split(f"[{link_alt}]({link_url})", 1)
+            text_part = sections[0]
+            content = sections[1]
+
+            new_nodes.append(
+                TextNode(text_part, TextType.TEXT)
+            )
+
+            new_nodes.append(
+                TextNode(link_alt, TextType.LINK, link_url)
+            )
 
     return new_nodes
 
