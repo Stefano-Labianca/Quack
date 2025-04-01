@@ -69,9 +69,15 @@ def split_nodes_image(old_nodes: list[TextNode]):
             new_nodes.append(
                 TextNode(image_alt, TextType.IMAGE, image_link)
             )
+        
+        if content != "":
+            new_nodes.append(
+                TextNode(content, TextType.TEXT)
+            )
 
     return new_nodes
-    
+
+
 def split_nodes_link(old_nodes: list[TextNode]):
     new_nodes: list[TextNode] = []
     link_extractor = extract_links("link")
@@ -103,6 +109,12 @@ def split_nodes_link(old_nodes: list[TextNode]):
             new_nodes.append(
                 TextNode(link_alt, TextType.LINK, link_url)
             )
+          
+        if content != "":
+            new_nodes.append(
+                TextNode(content, TextType.TEXT)
+            )
+
 
     return new_nodes
 
