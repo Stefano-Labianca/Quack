@@ -24,7 +24,7 @@ class LeafNode(HTMLNode):
             raise ValueError("All leaf nodes must have a value")
 
         if self.tag == None and self.props != None:
-            raise ValueError("`props` cannot be assigned to a non-None tag")
+            raise ValueError("`props` cannot be assigned to None tag")
 
         if self.tag == None:
             return self.value
