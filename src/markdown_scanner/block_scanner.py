@@ -18,7 +18,7 @@ def markdown_to_blocks(markdown: str) -> list[str]:
 
     return blocks
 
-def block_to_block_type(block):
+def block_to_block_type(block: str) -> BlockType:
     lines = block.split("\n")
 
     if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
