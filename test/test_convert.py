@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.abspath("./src"))
 
 from nodes.textnode import TextNode, TextType
-from convert import text_node_to_html_node
+from convert import text_node_to_html_node, text_to_textnodes
 
 
 
@@ -70,6 +70,58 @@ class TestTextNodeToHTMLNodeConverter(unittest.TestCase):
             f" src=\"{node.url}\" alt=\"{node.text}\""
         )
 
+    def test_text_to_textnodes_full(self):
+        full_md_str = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        nodes = text_to_textnodes(full_md_str)
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+
+        self.assertListEqual(expected, nodes)
+
+    def test_text_to_textnodes_without_links_and_images(self):
+        md_str = "This is **text** with an _italic_ word and a `code block` and an"
+        nodes = text_to_textnodes(md_str)
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an", TextType.TEXT)
+        ]
+
+        self.assertListEqual(expected, nodes)
+
+    def test_text_to_textnodes_plain_str(self):
+        md_str = "This is text with an italic word and a code block and an"
+        nodes = text_to_textnodes(md_str)
+        expected = [
+            TextNode("This is text with an italic word and a code block and an", TextType.TEXT),
+        ]
+
+        self.assertListEqual(expected, nodes)
+
+    def test_text_to_textnodes_with_only_italic(self):
+        md_str = "This is text with an _italic_ word and a code block and an"
+        nodes = text_to_textnodes(md_str)
+        expected = [
+            TextNode("This is text with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a code block and an", TextType.TEXT),
+        ]
+
+        self.assertListEqual(expected, nodes)
 
 if __name__ == "__main__":
     unittest.main()
