@@ -1,9 +1,8 @@
 import os
 import sys
-
-from markdown_scanner.block_scanner import markdown_to_blocks
 sys.path.append(os.path.abspath("./src"))
 
+from markdown_scanner.block_scanner import markdown_to_blocks
 import unittest
 
 

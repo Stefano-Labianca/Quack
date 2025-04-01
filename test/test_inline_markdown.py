@@ -1,6 +1,6 @@
 import unittest
 
-from mardown_scanner.inline_scanner import MalformattedMarkdownError, split_nodes_delimiter, extract_links, split_nodes_image, split_nodes_link
+from markdown_scanner.inline_scanner import MalformattedMarkdownError, split_nodes_delimiter, extract_links, split_nodes_image, split_nodes_link
 from nodes.textnode import TextNode, TextType
 
 class TestInlineMarkdown(unittest.TestCase):
