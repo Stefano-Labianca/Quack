@@ -1,14 +1,41 @@
-from markdown_scanner.block_scanner import markdown_to_blocks
+import re
+from markdown_scanner.block_scanner import block_to_block_type, markdown_to_blocks
 
 
 md = """
-This is **bolded** paragraph
+This should
+all be
+one match
 
-This is another paragraph with _italic_ text and `code` here
-This is the same paragraph on a new line
+# this should match heading
 
-- This is a list
-- with items
+### this should also match heading
+
+1. one 
+2. two 
+3. three 
+
+- one
+- two
+- three
+
+> Star quote block
+> Another quote
+
+this should be a second match
+Another paragrah
+
+and again
+
+```
+const foo = "bar"
+```
 """
 blocks = markdown_to_blocks(md)
-print(blocks)
+
+
+for block in blocks:
+    print(f"'{block}'")
+    print(block_to_block_type(block))
+    print("----------")
+
