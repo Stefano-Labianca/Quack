@@ -10,12 +10,6 @@ class BlockType(Enum):
     ORDERED_LIST = 6
 
 
-HEADING_REGEX = r"^(#{1,6})\s+(.+)$"
-CODE_REGEX = r"^```(?:\s*(\w+))?([\s\S]*?)^```$"
-QUOTE_REGEX = r"^>\s*(.+)$"
-UNOREDERE_REGEX = r"^\s*[-+*]\s+(.+)$"
-ORDERED_REGEX = r"^\s*\d+\.\s+(.+)$"
-
 def markdown_to_blocks(markdown: str) -> list[str]:
     blocks: list[str] = markdown.split("\n\n")
     
