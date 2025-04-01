@@ -137,7 +137,7 @@ class TestInlineMarkdown(unittest.TestCase):
             content
         )
 
-    def test_invalid_alt(self):
+    def test_invalid_image_alt(self):
         extractor = extract_links("image")
         text = "![invalid [alt]]](https://example.com/img.jpeg)"
         self.assertRaises(MalformattedMarkdownError, lambda *args, **kwargs: extractor(text)) 
@@ -160,3 +160,35 @@ class TestInlineMarkdown(unittest.TestCase):
         content = extractor(text)
         
         self.assertListEqual([], content)
+
+    def test_nested_alt_link(self):
+        text = "[alt [nested [more nested]]](https://example.com/img.jpeg)"
+        extractor = extract_links("link")
+        content = extractor(text)
+        
+        self.assertListEqual([("alt [nested [more nested]]", "https://example.com/img.jpeg")], content)
+
+    def test_multiple_nested_alt_link(self):
+        text = "[alt nested [more nested]](https://example.com/img.jpeg) and [again alt nested [more nested]](https://example.com/img.jpeg)"
+        extractor = extract_links("link")
+        content = extractor(text)
+
+        self.assertListEqual(
+            [('alt nested [more nested]', 'https://example.com/img.jpeg'), ('again alt nested [more nested]', 'https://example.com/img.jpeg')],
+            content
+        )
+    
+    def test_nested_and_simple_link_alt(self):
+        text = "This is text with a [rick [roll]](https://i.imgur.com/aKaOqIh.gif) and [obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        extractor = extract_links("link")
+        content = extractor(text)
+
+        self.assertListEqual(
+            [('rick [roll]', 'https://i.imgur.com/aKaOqIh.gif'), ('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')],
+            content
+        )
+
+    def test_invalid_link_alt(self):
+        text = "[invalid [alt]]](https://example.com/img.jpeg)"
+        extractor = extract_links("link")
+        self.assertRaises(MalformattedMarkdownError, lambda *args, **kwargs: extractor(text)) 

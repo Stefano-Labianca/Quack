@@ -3,8 +3,7 @@ from nodes.textnode import TextNode, TextType
 import re 
 
 MARKDOWN_IMAGE_REGEX = r"!\[(.*?)\]\(([^\(\)]*)\)"
-MARKDOWN_LINK_REGEX = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
-
+MARKDOWN_LINK_REGEX = r"(?<!!)\[([^\[\]].*?)\]\(([^\(\)]*)\)"
 
 class MalformattedMarkdownError(ValueError):
     def __init__(self, *args: object) -> None:
@@ -57,7 +56,6 @@ def extract_links(link_type: Literal["image"] | Literal["link"]):
         if err != None:
             raise err
 
-        # TODO: Need more test for this regex on links: (?<!!)\[([^\[\]].*?)\]\(([^\(\)]*)\)
         return links
 
     if link_type == "image":
