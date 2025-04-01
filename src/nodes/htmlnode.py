@@ -35,18 +35,6 @@ class HTMLNode:
                 "HTMLNode cannot have both `value` and `children` set. Pick one."
             )
 
-        if tag != None and not isinstance(tag, str):
-            raise TypeError("`tag` must be a string")
-
-        if value != None and not isinstance(value, str):
-            raise TypeError("`value` must be a string")
-
-        if children != None and not isinstance(children, list):
-            raise TypeError("`children` must be a list")
-
-        if props != None and not isinstance(props, dict):
-            raise TypeError("`props` must be a dictionary")
-
         self.tag = tag
         self.value = value
         self.children = children
