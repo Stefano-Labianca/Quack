@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 from nodes.textnode import TextNode, TextType
 import re 
 
@@ -42,38 +42,47 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
 def extract_links(link_type: Literal["image"] | Literal["link"]):
     def extract_markdown_images(text: str):        
         images = re.findall(MARKDOWN_IMAGE_REGEX, text)
-
-        for image in images:
-            brachets_stack: list[str] = []
-            alt_content: str = image[0]
-
-            if ("[" not in alt_content) and ("]" not in alt_content):
-                continue
-
-            for symbol in alt_content:
-                if symbol == "]" and len(brachets_stack) == 0:
-                    raise MalformattedMarkdownError(f"Malformatted image: {image}")
-
-                if symbol == "[":
-                    brachets_stack.append(symbol)
-                elif symbol == "]":
-                    brachets_stack.pop()
-
-            if len(brachets_stack) > 0:
-                raise MalformattedMarkdownError(f"Malformatted image: {image}")
+        err = __validate_alt_content(images)
+        
+        if err != None:
+            raise err
 
         return images
         
 
-
     def extract_markdown_links(text: str):
-        simple_links = re.findall(MARKDOWN_LINK_REGEX, text)
+        links = re.findall(MARKDOWN_LINK_REGEX, text)
+        err = __validate_alt_content(links)
 
-        # TODO: Handle Nested alt for links and image links inside a link
+        if err != None:
+            raise err
+
         # TODO: Need more test for this regex on links: (?<!!)\[([^\[\]].*?)\]\(([^\(\)]*)\)
-        return simple_links
+        return links
 
     if link_type == "image":
         return extract_markdown_images
     if link_type == "link":
         return extract_markdown_links
+    
+
+def __validate_alt_content(links: list[Any]):
+    for link in links:
+        brachets_stack: list[str] = []
+        alt_content: str = link[0]
+
+        if ("[" not in alt_content) and ("]" not in alt_content):
+            continue
+
+        for symbol in alt_content:
+            if symbol == "]" and len(brachets_stack) == 0:
+                return MalformattedMarkdownError(f"Malformatted link or image: {link}")
+
+            if symbol == "[":
+                brachets_stack.append(symbol)
+            elif symbol == "]":
+                brachets_stack.pop()
+
+        if len(brachets_stack) > 0:
+            return MalformattedMarkdownError(f"Malformatted link or image: {link}")
+    return None
