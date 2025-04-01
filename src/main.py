@@ -1,9 +1,14 @@
-from convert import text_to_textnodes
-from mardown_scanner.inline_scanner import split_nodes_image
-from nodes.textnode import TextNode, TextType
+from mardown_scanner.block_scanner import markdown_to_blocks
 
 
-full_md_str = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-nodes = text_to_textnodes(full_md_str)
+md = """
+This is **bolded** paragraph
 
-print(nodes)
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+blocks = markdown_to_blocks(md)
+print(blocks)
