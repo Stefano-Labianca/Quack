@@ -1,41 +1,30 @@
-import re
-from markdown_scanner.block_scanner import block_to_block_type, markdown_to_blocks
-
+from convert import markdown_to_html_node
 
 md = """
-This should
-all be
-one match
+# Hello `const foo = "bar"`
 
-# this should match heading
+This is **bolded** paragraph
+text in a p
+tag here
 
-### this should also match heading
+>Quote _with italic_ and **bold**
+>Again quote and `quote`
 
-1. one 
-2. two 
-3. three 
+This is another paragraph with _italic_ text and `code` here
 
-- one
-- two
-- three
-
-> Star quote block
-> Another quote
-
-this should be a second match
-Another paragrah
-
-and again
-
-```
-const foo = "bar"
-```
 """
-blocks = markdown_to_blocks(md)
+
+node = markdown_to_html_node(md)
+
+if node != None: 
+    print(node.to_html())
 
 
-for block in blocks:
-    print(f"'{block}'")
-    print(block_to_block_type(block))
-    print("----------")
+# md = """
+# ```
+# This is text that _should_ remain
+# the **same** even with inline stuff
+# ```
+# """
 
+# node = markdown_to_html_node(md)

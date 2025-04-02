@@ -1,5 +1,8 @@
+from markdown_scanner.block_scanner import BlockType, block_to_block_type, markdown_to_blocks
 from markdown_scanner.inline_scanner import split_nodes_delimiter, split_nodes_image, split_nodes_link
+from nodes.htmlnode import HTMLNode
 from nodes.leafnode import LeafNode
+from nodes.parentnode import ParentNode
 from nodes.textnode import InvalidTextNodeError, TextNode, TextType
 
 
@@ -30,6 +33,7 @@ class SplitPipeline:
     def end(self):
         return self.__nodes
 
+
 def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     match text_node.text_type:
         case TextType.TEXT:
@@ -55,9 +59,138 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
 
-def text_to_textnodes(text: str):
+
+def block_node_to_html_node(block: str) -> tuple[BlockType, HTMLNode]:
+    block_type = block_to_block_type(block)
+
+    match block_type:
+        case BlockType.PARAGRAPH:
+            return (BlockType.PARAGRAPH, ParentNode("p", []))
+        
+        case BlockType.QUOTE:
+            return (BlockType.QUOTE, ParentNode("blockquote", []))
+        
+        case BlockType.UNORDERED_LIST:
+            return (BlockType.UNORDERED_LIST, ParentNode("ul", []))
+        
+        case BlockType.ORDERED_LIST:
+            return (BlockType.ORDERED_LIST, ParentNode("ol", []))
+        
+        case BlockType.CODE:
+            return (BlockType.CODE, ParentNode("pre", []))
+        
+        case BlockType.HEADING:
+            hash_amount = count_heading_hash(block)
+            heading_tag = f"h{hash_amount}"
+
+            return (BlockType.HEADING, ParentNode(heading_tag, []))
+
+
+def text_to_textnodes(text: str) -> list[TextNode]:
     pipeline = SplitPipeline(text)
     pipeline = pipeline.bold().italic().code().image().link()
-  
+    
     return pipeline.end()
 
+
+def markdown_to_html_node(document: str):
+    blocks = markdown_to_blocks(document)
+    parents: list[HTMLNode] = []
+    root = ParentNode("div", children=[])
+
+    for block in blocks:
+        parent_type, parent = block_node_to_html_node(block)
+        children_generator = text_to_children_fn(parent_type)
+
+        if children_generator == None: return
+
+        parent.children = children_generator(block)
+        parents.append(parent)
+
+        print(parent)
+        print("-------------")
+
+    root.children = parents
+    return root
+
+
+
+def text_to_children_fn(block_type: BlockType):
+    match block_type:
+        case BlockType.PARAGRAPH:
+            return text_to_children_paragraph
+        
+        case BlockType.HEADING:
+            return text_to_children_heading
+        
+        case BlockType.QUOTE:
+            return text_to_children_quote
+        
+        # case BlockType.UNORDERED_LIST:
+        #     return (BlockType.UNORDERED_LIST, ParentNode("ul", []))
+        
+        # case BlockType.ORDERED_LIST:
+        #     return (BlockType.ORDERED_LIST, ParentNode("ol", []))
+        
+        # case BlockType.CODE:
+        #     return (BlockType.CODE, ParentNode("pre", []))
+        
+
+def text_to_children_quote(text: str) -> list[ParentNode]:
+    text = text.replace(">", "")
+    lines = text.split("\n")
+    paragraphs = []
+
+    for line in lines:
+        children = text_to_children_paragraph(line)
+        p = ParentNode("p", children)
+        paragraphs.append(p)
+
+    return paragraphs
+
+
+def text_to_children_heading(text: str):
+    hash_amount = count_heading_hash(text)
+    heading_content = text.split(f"{'#' * hash_amount} ")[1]
+
+    children: list[LeafNode] = []
+    nodes = text_to_textnodes(heading_content)
+
+    for node in nodes:
+        child = text_node_to_html_node(node)
+        children.append(child)
+
+    return children
+
+
+def text_to_children_paragraph(text: str) -> list[LeafNode]:
+    children: list[LeafNode] = []
+    lines = text.split("\n")
+
+    for idx in range(len(lines)):
+        line = lines[idx]
+        
+        if idx != len(lines) - 1:
+            line = f"{line} "
+
+        nodes = text_to_textnodes(line)
+
+        for node in nodes:
+            child = text_node_to_html_node(node)
+            children.append(child)
+
+    return children
+
+
+def count_heading_hash(heading: str) -> int:
+    amount = 0
+
+    for c in heading:
+        if c == "#":
+            amount += 1
+            continue
+
+        if c == " ":
+            break
+
+    return amount
