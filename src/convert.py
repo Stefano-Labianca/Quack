@@ -5,7 +5,6 @@ from nodes.leafnode import LeafNode
 from nodes.parentnode import ParentNode
 from nodes.textnode import InvalidTextNodeError, TextNode, TextType
 
-MAX_HEADING_LEVEL = 6
 
 class SplitPipeline:
     def __init__(self, md_str: str) -> None:
@@ -83,7 +82,7 @@ def block_node_to_html_node(block: str) -> tuple[BlockType, HTMLNode]:
         case BlockType.HEADING:
             hash_amount = count_heading_hash(block)
 
-            if hash_amount > MAX_HEADING_LEVEL:
+            if hash_amount + 1 >= len(block):
                 raise MalformattedMarkdownError(f"invalid heading level: {hash_amount}")
 
             heading_tag = f"h{hash_amount}"
@@ -195,7 +194,7 @@ def text_to_children_quote(text: str) -> list[LeafNode]:
 def text_to_children_heading(text: str):
     hash_amount = count_heading_hash(text)
 
-    if hash_amount > MAX_HEADING_LEVEL:
+    if hash_amount + 1 >= len(text):
         raise MalformattedMarkdownError(f"invalid heading level: {hash_amount}")
 
     heading_content = text.split(f"{'#' * hash_amount} ")[1]
