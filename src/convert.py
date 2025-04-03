@@ -97,6 +97,17 @@ def text_to_textnodes(text: str) -> list[TextNode]:
     return pipeline.end()
 
 
+def extract_title(markdown: str) -> str:
+    blocks = markdown_to_blocks(markdown)
+    title = blocks[0]
+    
+    if not title.startswith("# "):
+        raise Exception("No title found")
+    
+    return title.lstrip("# ").strip()
+        
+
+
 def markdown_to_html_node(document: str) -> ParentNode:
     blocks = markdown_to_blocks(document)
     parents: list[HTMLNode] = []

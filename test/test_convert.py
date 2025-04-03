@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.abspath("./src"))
 
 from nodes.textnode import TextNode, TextType
-from convert import markdown_to_html_node, text_node_to_html_node, text_to_textnodes
+from convert import extract_title, markdown_to_html_node, text_node_to_html_node, text_to_textnodes
 
 
 
@@ -222,6 +222,21 @@ the **same** even with inline stuff
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
 
+
+    def test_title_extraction(self):
+        md = """
+# Hello
+
+## Subtitle
+
+Some content
+"""     
+        title = extract_title(md)
+        self.assertEqual("Hello", title)
+
+
+    def test_no_title_extraction(self):
+        self.assertRaises(Exception, lambda *args, **kwargs: extract_title("## No title"))
 
 if __name__ == "__main__":
     unittest.main()
