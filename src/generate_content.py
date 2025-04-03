@@ -64,7 +64,6 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
     page_title = extract_title(md_content)
 
     page = template_content.replace("{{ Title }}", page_title).replace("{{ Content }}", generated_html)
-    # base_dir = os.path.dirname(dest_path)
 
     new_html_page_file = open(dest_path, "x")
     new_html_page_file.write(page)
