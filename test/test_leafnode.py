@@ -30,7 +30,7 @@ class TestLeafNode(unittest.TestCase):
     def test_escape_chars(self):
         node = LeafNode("p", "<Hello '& \"World\">")
         self.assertEqual(
-            node.to_html(), "<p>&lt;Hello ;&amp; World&gt;</p>"
+            node.to_html(), "<p>&lt;Hello '&amp; \"World\"&gt;</p>"
         )
 
 
