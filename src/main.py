@@ -7,6 +7,7 @@ from markdown_scanner.block_scanner import markdown_to_blocks
 PUBLIC_FOLDER_PATH = "./public/"
 SOURCE_FOLDER = "./static/"
 TEMPLATE_PAHT = "./template.html"
+CONTENT_FOLDER_PATH = "./content/"
 
 def create_public_folder():
     os.mkdir(PUBLIC_FOLDER_PATH)
@@ -81,6 +82,10 @@ def main():
     
     copy_from_static_folder()
     print("\n ------ Start Generation ------")
-    generate_page("./content/index.md", TEMPLATE_PAHT, f"{PUBLIC_FOLDER_PATH}index.html")
+    generate_page( 
+        os.path.join(CONTENT_FOLDER_PATH, "index.md"),
+        TEMPLATE_PAHT,
+        os.path.join(PUBLIC_FOLDER_PATH, "index.html")
+    )
 
 main()
