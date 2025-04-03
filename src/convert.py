@@ -1,10 +1,11 @@
 from markdown_scanner.block_scanner import BlockType, block_to_block_type, markdown_to_blocks
-from markdown_scanner.inline_scanner import split_nodes_delimiter, split_nodes_image, split_nodes_link
+from markdown_scanner.inline_scanner import MalformattedMarkdownError, split_nodes_delimiter, split_nodes_image, split_nodes_link
 from nodes.htmlnode import HTMLNode
 from nodes.leafnode import LeafNode
 from nodes.parentnode import ParentNode
 from nodes.textnode import InvalidTextNodeError, TextNode, TextType
 
+MAX_HEADING_LEVEL = 6
 
 class SplitPipeline:
     def __init__(self, md_str: str) -> None:
@@ -81,6 +82,10 @@ def block_node_to_html_node(block: str) -> tuple[BlockType, HTMLNode]:
         
         case BlockType.HEADING:
             hash_amount = count_heading_hash(block)
+
+            if hash_amount > MAX_HEADING_LEVEL:
+                raise MalformattedMarkdownError(f"invalid heading level: {hash_amount}")
+
             heading_tag = f"h{hash_amount}"
 
             return (BlockType.HEADING, ParentNode(heading_tag, []))
@@ -93,7 +98,7 @@ def text_to_textnodes(text: str) -> list[TextNode]:
     return pipeline.end()
 
 
-def markdown_to_html_node(document: str):
+def markdown_to_html_node(document: str) -> ParentNode:
     blocks = markdown_to_blocks(document)
     parents: list[HTMLNode] = []
     root = ParentNode("div", children=[])
@@ -101,18 +106,12 @@ def markdown_to_html_node(document: str):
     for block in blocks:
         parent_type, parent = block_node_to_html_node(block)
         children_generator = text_to_children_fn(parent_type)
-
-        if children_generator == None: return
-
         parent.children = children_generator(block)
         parents.append(parent)
 
-        print(parent)
-        print("-------------")
-
     root.children = parents
-    return root
 
+    return root
 
 
 def text_to_children_fn(block_type: BlockType):
@@ -126,31 +125,79 @@ def text_to_children_fn(block_type: BlockType):
         case BlockType.QUOTE:
             return text_to_children_quote
         
-        # case BlockType.UNORDERED_LIST:
-        #     return (BlockType.UNORDERED_LIST, ParentNode("ul", []))
+        case BlockType.UNORDERED_LIST:
+            return text_to_children_unordered_list
         
-        # case BlockType.ORDERED_LIST:
-        #     return (BlockType.ORDERED_LIST, ParentNode("ol", []))
+        case BlockType.ORDERED_LIST:
+            return text_to_children_ordered_list
         
-        # case BlockType.CODE:
-        #     return (BlockType.CODE, ParentNode("pre", []))
+        case BlockType.CODE:
+            return text_to_children_code_block
         
 
-def text_to_children_quote(text: str) -> list[ParentNode]:
-    text = text.replace(">", "")
+def text_to_children_code_block(text: str) -> list[LeafNode]:
+    if not text.startswith("```") or not text.endswith("```"):
+        raise MalformattedMarkdownError("invalid code block")
+
+    text = text.replace("```", "").replace("\n", "", 1)
+    code_node = TextNode(text, TextType.CODE)
+    code_tag = text_node_to_html_node(code_node)
+
+    return [code_tag]
+
+
+def text_to_children_ordered_list(text: str) -> list[ParentNode]:
     lines = text.split("\n")
-    paragraphs = []
+    element = []
+
+    for line in lines:
+        line = line[3:].strip()
+        children = text_to_children_paragraph(line)
+        li = ParentNode("li", children)
+        element.append(li)
+
+    return element
+
+
+def text_to_children_unordered_list(text: str) -> list[ParentNode]:
+    text = text.replace("- ", "")
+    lines = text.split("\n")
+    element = []
 
     for line in lines:
         children = text_to_children_paragraph(line)
-        p = ParentNode("p", children)
-        paragraphs.append(p)
+        li = ParentNode("li", children)
+        element.append(li)
 
-    return paragraphs
+    return element
+
+
+def text_to_children_quote(text: str) -> list[LeafNode]:
+    lines = text.split("\n")
+
+    for line in lines:
+        if not line.startswith(">"):
+            raise MalformattedMarkdownError("invalid quote block")
+
+    text = text.replace(">", "")
+    new_lines = []
+
+    for line in lines:
+        new_lines.append(line[2:].strip())
+
+    content = " ".join(new_lines)
+    node = LeafNode(None, content)
+
+    return [node]
+
 
 
 def text_to_children_heading(text: str):
     hash_amount = count_heading_hash(text)
+
+    if hash_amount > MAX_HEADING_LEVEL:
+        raise MalformattedMarkdownError(f"invalid heading level: {hash_amount}")
+
     heading_content = text.split(f"{'#' * hash_amount} ")[1]
 
     children: list[LeafNode] = []
@@ -188,9 +235,7 @@ def count_heading_hash(heading: str) -> int:
     for c in heading:
         if c == "#":
             amount += 1
-            continue
-
-        if c == " ":
+        else:
             break
 
     return amount
