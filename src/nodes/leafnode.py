@@ -15,7 +15,7 @@ class LeafNode(HTMLNode):
         For example, a link (`<a>` tag) might have `{"href": "https://www.google.com"}`
         """
         if value != None:
-            value = html.escape(value)
+            value = html.escape(value, False)
 
         super().__init__(tag, value, [], props)
 
