@@ -1,3 +1,4 @@
+from genericpath import isfile
 import os
 import shutil
 from convert import extract_title, markdown_to_html_node
@@ -5,7 +6,7 @@ from convert import extract_title, markdown_to_html_node
 
 PUBLIC_FOLDER_PATH = "./public/"
 SOURCE_FOLDER = "./static/"
-TEMPLATE_PAHT = "./template.html"
+TEMPLATE_PATH = "./template.html"
 CONTENT_FOLDER_PATH = "./content/"
 
 def create_public_folder():
@@ -65,6 +66,28 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
 
     page = template_content.replace("{{ Title }}", page_title).replace("{{ Content }}", generated_html)
 
+    dest_dir_path = os.path.dirname(dest_path)
+    if dest_dir_path != "":
+        os.makedirs(dest_dir_path, exist_ok=True)
+
     new_html_page_file = open(dest_path, "x")
     new_html_page_file.write(page)
     new_html_page_file.close()
+
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str):
+    files = os.listdir(dir_path_content)
+    
+    for file in files:
+        source_path = os.path.join(dir_path_content, file)
+        dest_path = os.path.join(dest_dir_path, file)
+
+        if os.path.isfile(source_path):            
+            html_file_name = file.replace("md", "html")
+
+            dest_path = os.path.join(dest_dir_path, html_file_name)
+            generate_page(source_path, template_path, dest_path)
+        else:
+            generate_pages_recursive(source_path, template_path, dest_path)
+
+
+
