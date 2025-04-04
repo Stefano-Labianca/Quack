@@ -10,9 +10,9 @@ from generate_content import (
 def main():
     basepath = "/"
 
-    if len(sys.argv) > 0:
-        basepath = sys.argv[0]
-    
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+
     remove_public_folder()
     create_public_folder()
 

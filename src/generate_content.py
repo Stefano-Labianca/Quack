@@ -65,7 +65,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str, basepath: 
     page_title = extract_title(md_content)
 
     page = template_content.replace("{{ Title }}", page_title).replace("{{ Content }}", generated_html)
-    page = page.replace("href=\"/", f"href=\"/{basepath}").replace("src=\"/", f"src=\"/{basepath}")
+    page = page.replace("href=\"/", f"href=\"{basepath}").replace("src=\"/", f"src=\"{basepath}")
 
     dest_dir_path = os.path.dirname(dest_path)
     if dest_dir_path != "":
