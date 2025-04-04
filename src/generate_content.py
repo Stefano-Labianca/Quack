@@ -4,7 +4,7 @@ import shutil
 from convert import extract_title, markdown_to_html_node
 
 
-PUBLIC_FOLDER_PATH = "./public/"
+PUBLIC_FOLDER_PATH = "./docs/"
 SOURCE_FOLDER = "./static/"
 TEMPLATE_PATH = "./template.html"
 CONTENT_FOLDER_PATH = "./content/"
@@ -50,7 +50,7 @@ def copy_from_static_folder(start: str = SOURCE_FOLDER):
         copy_from_static_folder(src_file_path)
 
 
-def generate_page(from_path: str, template_path: str, dest_path: str):
+def generate_page(from_path: str, template_path: str, dest_path: str, basepath: str):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     md_file = open(from_path)
     md_content = md_file.read()
@@ -65,6 +65,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
     page_title = extract_title(md_content)
 
     page = template_content.replace("{{ Title }}", page_title).replace("{{ Content }}", generated_html)
+    page = page.replace("href=\"/", f"href=\"/{basepath}").replace("src=\"/", f"src=\"/{basepath}")
 
     dest_dir_path = os.path.dirname(dest_path)
     if dest_dir_path != "":
@@ -74,7 +75,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
     new_html_page_file.write(page)
     new_html_page_file.close()
 
-def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str):
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, basepath: str):
     files = os.listdir(dir_path_content)
     
     for file in files:
@@ -85,9 +86,9 @@ def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir
             html_file_name = file.replace("md", "html")
 
             dest_path = os.path.join(dest_dir_path, html_file_name)
-            generate_page(source_path, template_path, dest_path)
+            generate_page(source_path, template_path, dest_path, basepath)
         else:
-            generate_pages_recursive(source_path, template_path, dest_path)
+            generate_pages_recursive(source_path, template_path, dest_path, basepath)
 
 
 

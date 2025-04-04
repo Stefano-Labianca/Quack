@@ -1,4 +1,5 @@
 import os
+import sys
 from generate_content import (
     CONTENT_FOLDER_PATH, PUBLIC_FOLDER_PATH, TEMPLATE_PATH, 
     copy_from_static_folder,  create_public_folder, 
@@ -7,6 +8,11 @@ from generate_content import (
 
 
 def main():
+    basepath = "/"
+
+    if len(sys.argv) > 0:
+        basepath = sys.argv[0]
+    
     remove_public_folder()
     create_public_folder()
 
@@ -15,6 +21,6 @@ def main():
     
     copy_from_static_folder()
     print("\n ------ Start Generation ------")
-    generate_pages_recursive(CONTENT_FOLDER_PATH, TEMPLATE_PATH, PUBLIC_FOLDER_PATH)
+    generate_pages_recursive(CONTENT_FOLDER_PATH, TEMPLATE_PATH, PUBLIC_FOLDER_PATH, basepath)
 
 main()
